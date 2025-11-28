@@ -56,157 +56,232 @@ navLinks.forEach(link => {
             });
         }
     });
-    const typingText = document.getElementById('typingText');
-    const titles = [
-        'Lead Generation Specialist',
-        'Sales Development Expert',
-        'B2B Sales Professional',
-        'CRM Management Specialist'
-    ];
+});
 
-    let titleIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    let typingSpeed = 100;
+// Active navigation link on scroll
+const sections = document.querySelectorAll('section');
+const navbar = document.getElementById('navbar');
 
-    function typeTitle() {
-        const currentTitle = titles[titleIndex];
+// Debounce function for better performance
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
-        if (isDeleting) {
-            typingText.textContent = currentTitle.substring(0, charIndex - 1);
-            charIndex--;
-            typingSpeed = 50;
-        } else {
-            typingText.textContent = currentTitle.substring(0, charIndex + 1);
-            charIndex++;
-            typingSpeed = 100;
-        }
-
-        if (!isDeleting && charIndex === currentTitle.length) {
-            // Pause at end
-            typingSpeed = 2000;
-            isDeleting = true;
-        } else if (isDeleting && charIndex === 0) {
-            isDeleting = false;
-            titleIndex = (titleIndex + 1) % titles.length;
-            typingSpeed = 500;
-        }
-
-        setTimeout(typeTitle, typingSpeed);
+function handleScroll() {
+    // Add scrolled class to navbar
+    if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
     }
 
-    // Start typing animation after page load
-    window.addEventListener('load', () => {
-        setTimeout(typeTitle, 1000);
+    // Update active navigation link
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (window.scrollY >= sectionTop - 100) {
+            current = section.getAttribute('id');
+        }
     });
 
-    // ===================================
-    // Scroll Animations
-    // ===================================
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+        }
+    });
+}
 
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
+// Use debounced scroll handler
+window.addEventListener('scroll', debounce(handleScroll, 10));
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+// ===================================
+// Typing Animation
+// ===================================
 
-                // Animate skill progress bars
-                if (entry.target.classList.contains('skill-category')) {
-                    const progressBars = entry.target.querySelectorAll('.skill-progress');
-                    progressBars.forEach(bar => {
-                        const progress = bar.getAttribute('data-progress');
-                        setTimeout(() => {
-                            bar.style.width = progress + '%';
-                        }, 200);
-                    });
-                }
+const typingText = document.getElementById('typingText');
+const titles = [
+    'Lead Generation Specialist',
+    'Sales Development Expert',
+    'B2B Sales Professional',
+    'CRM Management Specialist'
+];
+
+let titleIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+let typingSpeed = 100;
+
+function typeTitle() {
+    const currentTitle = titles[titleIndex];
+
+    if (isDeleting) {
+        typingText.textContent = currentTitle.substring(0, charIndex - 1);
+        charIndex--;
+        typingSpeed = 50;
+    } else {
+        typingText.textContent = currentTitle.substring(0, charIndex + 1);
+        charIndex++;
+        typingSpeed = 100;
+    }
+
+    if (!isDeleting && charIndex === currentTitle.length) {
+        // Pause at end
+        typingSpeed = 2000;
+        isDeleting = true;
+    } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        titleIndex = (titleIndex + 1) % titles.length;
+        typingSpeed = 500;
+    }
+
+    setTimeout(typeTitle, typingSpeed);
+}
+
+// Start typing animation after page load
+window.addEventListener('load', () => {
+    setTimeout(typeTitle, 1000);
+});
+
+// ===================================
+// Scroll Animations
+// ===================================
+
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -100px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+
+            // Animate skill progress bars
+            if (entry.target.classList.contains('skill-category')) {
+                const progressBars = entry.target.querySelectorAll('.skill-progress');
+                progressBars.forEach(bar => {
+                    const progress = bar.getAttribute('data-progress');
+                    setTimeout(() => {
+                        bar.style.width = progress + '%';
+                    }, 200);
+                });
+            }
+        }
+    });
+}, observerOptions);
+
+// Observe elements for scroll animations
+const animateOnScroll = document.querySelectorAll('.skill-category, .education-card, .contact-card, .about-content, .timeline-item');
+animateOnScroll.forEach(el => {
+    el.classList.add('fade-in');
+    observer.observe(el);
+});
+
+// ===================================
+// Experience Accordion
+// ===================================
+
+const experienceCards = document.querySelectorAll('.experience-card');
+
+experienceCards.forEach(card => {
+    const expandBtn = card.querySelector('.expand-btn');
+
+    expandBtn.addEventListener('click', () => {
+        // Close other cards
+        experienceCards.forEach(otherCard => {
+            if (otherCard !== card && otherCard.classList.contains('expanded')) {
+                otherCard.classList.remove('expanded');
             }
         });
-    }, observerOptions);
 
-    // Observe elements for scroll animations
-    const animateOnScroll = document.querySelectorAll('.skill-category, .education-card, .contact-card, .about-content, .timeline-item');
-    animateOnScroll.forEach(el => {
-        el.classList.add('fade-in');
-        observer.observe(el);
+        // Toggle current card
+        card.classList.toggle('expanded');
     });
+});
 
-    // ===================================
-    // Experience Accordion
-    // ===================================
+// Expand first experience card by default
+if (experienceCards.length > 0) {
+    experienceCards[0].classList.add('expanded');
+}
 
-    const experienceCards = document.querySelectorAll('.experience-card');
+// ===================================
+// Contact Form Handling
+// ===================================
 
-    experienceCards.forEach(card => {
-        const expandBtn = card.querySelector('.expand-btn');
+const contactForm = document.getElementById('contactForm');
 
-        expandBtn.addEventListener('click', () => {
-            // Close other cards
-            experienceCards.forEach(otherCard => {
-                if (otherCard !== card && otherCard.classList.contains('expanded')) {
-                    otherCard.classList.remove('expanded');
-                }
-            });
+contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-            // Toggle current card
-            card.classList.toggle('expanded');
-        });
-    });
+    // Get form data
+    const formData = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        subject: document.getElementById('subject').value.trim(),
+        message: document.getElementById('message').value.trim()
+    };
 
-    // Expand first experience card by default
-    if (experienceCards.length > 0) {
-        experienceCards[0].classList.add('expanded');
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+        showNotification('Please fill in all fields', 'error');
+        return;
     }
 
-    // ===================================
-    // Contact Form Handling
-    // ===================================
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+        showNotification('Please enter a valid email address', 'error');
+        return;
+    }
 
-    const contactForm = document.getElementById('contactForm');
+    // Create mailto link (since this is a static site)
+    const mailtoLink = `mailto:orchidchakma@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(
+        `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+    )}`;
 
-    contactForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    // Open email client
+    window.location.href = mailtoLink;
 
-        // Get form data
-        const formData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            subject: document.getElementById('subject').value,
-            message: document.getElementById('message').value
-        };
+    // Show success message
+    showNotification('Message prepared! Your email client will open.', 'success');
 
-        // Create mailto link (since this is a static site)
-        const mailtoLink = `mailto:orchidchakma@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(
-            `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-        )}`;
+    // Reset form
+    contactForm.reset();
+});
 
-        // Open email client
-        window.location.href = mailtoLink;
+// ===================================
+// Notification System
+// ===================================
 
-        // Show success message
-        showNotification('Message prepared! Your email client will open.', 'success');
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
 
-        // Reset form
-        contactForm.reset();
-    });
+    let bgGradient;
+    if (type === 'success') {
+        bgGradient = 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)';
+    } else if (type === 'error') {
+        bgGradient = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+    } else {
+        bgGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    }
 
-    // ===================================
-    // Notification System
-    // ===================================
-
-    function showNotification(message, type = 'info') {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.style.cssText = `
+    notification.style.cssText = `
         position: fixed;
         top: 100px;
         right: 20px;
-        background: ${type === 'success' ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+        background: ${bgGradient};
         color: white;
         padding: 16px 24px;
         border-radius: 12px;
@@ -215,24 +290,27 @@ navLinks.forEach(link => {
         animation: slideInRight 0.3s ease-out;
         font-weight: 500;
         max-width: 300px;
+        font-size: 14px;
     `;
-        notification.textContent = message;
+    notification.textContent = message;
 
-        // Add to page
-        document.body.appendChild(notification);
+    // Add to page
+    document.body.appendChild(notification);
 
-        // Remove after 3 seconds
+    // Remove after 4 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
         setTimeout(() => {
-            notification.style.animation = 'slideOutRight 0.3s ease-out';
-            setTimeout(() => {
+            if (document.body.contains(notification)) {
                 document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
-    }
+            }
+        }, 300);
+    }, 4000);
+}
 
-    // Add notification animations to CSS dynamically
-    const style = document.createElement('style');
-    style.textContent = `
+// Add notification animations to CSS dynamically
+const style = document.createElement('style');
+style.textContent = `
     @keyframes slideInRight {
         from {
             transform: translateX(400px);
@@ -255,82 +333,88 @@ navLinks.forEach(link => {
         }
     }
 `;
-    document.head.appendChild(style);
+document.head.appendChild(style);
 
-    // ===================================
-    // Parallax Effect for Hero
-    // ===================================
+// ===================================
+// Parallax Effect for Hero
+// ===================================
 
-    window.addEventListener('scroll', () => {
-        const scrolled = window.scrollY;
-        const heroContent = document.querySelector('.hero-content');
-        const gradientOrbs = document.querySelectorAll('.gradient-orb');
+let ticking = false;
 
-        if (heroContent && scrolled < window.innerHeight) {
-            heroContent.style.transform = `translateY(${scrolled * 0.5}px)`;
-            heroContent.style.opacity = 1 - (scrolled / window.innerHeight);
-        }
+function updateParallax() {
+    const scrolled = window.scrollY;
+    const heroContent = document.querySelector('.hero-content');
+    const gradientOrbs = document.querySelectorAll('.gradient-orb');
 
-        gradientOrbs.forEach((orb, index) => {
-            const speed = 0.3 + (index * 0.1);
-            orb.style.transform = `translate(${scrolled * speed}px, ${scrolled * speed * 0.5}px)`;
+    if (heroContent && scrolled < window.innerHeight) {
+        heroContent.style.transform = `translateY(${scrolled * 0.5}px)`;
+        heroContent.style.opacity = 1 - (scrolled / window.innerHeight);
+    }
+
+    gradientOrbs.forEach((orb, index) => {
+        const speed = 0.3 + (index * 0.1);
+        orb.style.transform = `translate(${scrolled * speed}px, ${scrolled * speed * 0.5}px)`;
+    });
+
+    ticking = false;
+}
+
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        window.requestAnimationFrame(updateParallax);
+        ticking = true;
+    }
+});
+
+// ===================================
+// Performance Optimization
+// ===================================
+
+// Lazy load images when implemented
+document.addEventListener('DOMContentLoaded', () => {
+    const lazyImages = document.querySelectorAll('img[data-src]');
+
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.removeAttribute('data-src');
+                imageObserver.unobserve(img);
+            }
         });
     });
 
-    // ===================================
-    // Performance Optimization
-    // ===================================
+    lazyImages.forEach(img => imageObserver.observe(img));
+});
 
-    // Lazy load images when implemented
-    document.addEventListener('DOMContentLoaded', () => {
-        const lazyImages = document.querySelectorAll('img[data-src]');
+// ===================================
+// Keyboard Navigation
+// ===================================
 
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.removeAttribute('data-src');
-                    imageObserver.unobserve(img);
-                }
-            });
-        });
+// Close mobile menu with Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+        navMenu.classList.remove('active');
+        const spans = mobileMenuToggle.querySelectorAll('span');
+        spans[0].style.transform = 'none';
+        spans[1].style.opacity = '1';
+        spans[2].style.transform = 'none';
+    }
+});
 
-        lazyImages.forEach(img => imageObserver.observe(img));
-    });
+// ===================================
+// Initialize
+// ===================================
 
-    // ===================================
-    // Keyboard Navigation
-    // ===================================
+// Initial call to set navbar state
+handleScroll();
 
-    // Close mobile menu with Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && navMenu.classList.contains('active')) {
-            navMenu.classList.remove('active');
-            const spans = mobileMenuToggle.querySelectorAll('span');
-            spans[0].style.transform = 'none';
-            spans[1].style.opacity = '1';
-            spans[2].style.transform = 'none';
-        }
-    });
+// ===================================
+// Console Message
+// ===================================
 
-    // ===================================
-    // Smooth Page Load
-    // ===================================
-
-    window.addEventListener('load', () => {
-        document.body.style.opacity = '0';
-        setTimeout(() => {
-            document.body.style.transition = 'opacity 0.5s ease-in';
-            document.body.style.opacity = '1';
-        }, 100);
-    });
-
-    // ===================================
-    // Console Message
-    // ===================================
-
-    console.log('%c👋 Welcome to Orchid Chakma\'s Portfolio!', 'color: #6366f1; font-size: 20px; font-weight: bold;');
-    console.log('%cLooking for a Lead Generation Specialist? Let\'s connect!', 'color: #8b5cf6; font-size: 14px;');
-    console.log('%c📧 orchidchakma@gmail.com', 'color: #ec4899; font-size: 12px;');
-    console.log('%c🔗 linkedin.com/in/orchidchakma', 'color: #10b981; font-size: 12px;');
+console.log('%c👋 Welcome to Orchid Chakma\'s Portfolio!', 'color: #6366f1; font-size: 20px; font-weight: bold;');
+console.log('%cLooking for a Lead Generation Specialist? Let\'s connect!', 'color: #8b5cf6; font-size: 14px;');
+console.log('%c📧 orchidchakma@gmail.com', 'color: #ec4899; font-size: 12px;');
+console.log('%c🔗 linkedin.com/in/orchidchakma', 'color: #10b981; font-size: 12px;');
