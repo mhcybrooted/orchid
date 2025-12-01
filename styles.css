@@ -1434,3 +1434,18 @@ section {
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
+/* Footer Logo Styling */
+.footer-logo {
+    height: 60px;
+    width: auto;
+    max-width: 250px;
+    object-fit: contain;
+    margin-bottom: var(--space-4);
+    filter: brightness(1);
+    transition: all var(--transition-base);
+}
+
+.footer-logo:hover {
+    filter: brightness(1.1);
+    transform: scale(1.02);
+}
