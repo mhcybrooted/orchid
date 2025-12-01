@@ -218,6 +218,26 @@ ul {
     background-clip: text;
 }
 
+/* Logo Styling */
+.nav-brand a {
+    display: inline-block;
+    line-height: 0;
+}
+
+.brand-logo {
+    height: 50px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    transition: all var(--transition-base);
+    filter: brightness(1);
+}
+
+.brand-logo:hover {
+    transform: scale(1.05) translateY(-2px);
+    filter: brightness(1.1) drop-shadow(0 0 15px rgba(99, 102, 241, 0.6));
+}
+
 .nav-menu {
     display: flex;
     gap: var(--space-8);
@@ -299,6 +319,18 @@ ul {
 
     .nav-link {
         font-size: var(--text-lg);
+    }
+
+    .brand-logo {
+        height: 40px;
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-logo {
+        height: 35px;
+        max-width: 120px;
     }
 }
 
